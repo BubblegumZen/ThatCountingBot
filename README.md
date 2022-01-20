@@ -17,3 +17,21 @@ ThatCountingBot is a discord bot written in python which uses `discord.py` wrapp
 In addition to this, it offers the `$setup` command for the counting channel and current number configuration. an `--existing` flag can be passed to the command, so it will try to look for the recent messages for a number to continue from. After pressing the `Set Channel` Button, the bot will ask the user to ping a channel.
 
 ![image](https://user-images.githubusercontent.com/97220904/150377161-927efed4-1a31-4121-a7e2-4a359028dc7f.png)
+
+# How to run the bot
+
+1. Go to [Discord Developer Page](https://discord.com/developers/applications)
+2. Create an Application
+3. Head over to `Bot` section and select `Create a bot account`
+4. Turn on `Message Intent` and `Guild/Server Member Intent`.
+5. Click on `COPY TOKEN`
+6. Clone this repository to a local folde
+7. Open `config.py` file and replace the placeholder `BOT_TOKEN` with the token you just copied.
+8. Open command prompt and change your working directory to the folder you cloned the repo into.
+> Recommended (Create a virtual environment!) [If you do not want this, skip to #12]
+9. Type `py -3.10 -m venv count` and wait for it to create the Virtual Environment
+10. Type `source count/bin/activate/`
+11. If everything went well, you should now see something like this: `(count) .../your_directory`
+12. Type `python main.py`
+
+And you should see `<bot name> Is now online!`. Your bot should now be online and ready to be used. The `requirements.txt` will be installed automatically before the bot starts.
