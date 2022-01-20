@@ -1,0 +1,26 @@
+aiodns==3.0.0
+aiohttp==3.7.4.post0
+anyio==3.4.0
+asqlite @ git+https://github.com/Rapptz/asqlite.git
+async-timeout==3.0.1
+attrs==21.4.0
+cchardet==2.1.7
+certifi==2021.10.8
+cffi==1.15.0
+chardet==4.0.0
+charset-normalizer==2.0.10
+discord.py @ git+https://github.com/BubblegumZen/discord.py.git
+h11==0.12.0
+httpcore==0.14.4
+httpx==0.21.3
+humanize
+idna==3.3
+jishaku
+multidict==5.2.0
+pycares==4.1.2
+pycparser==2.21
+rfc3986==1.5.0
+sniffio==1.2.0
+typing-extensions==4.0.1
+uvloop==0.16.0
+yarl==1.7.2
