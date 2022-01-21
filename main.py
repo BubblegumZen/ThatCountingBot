@@ -234,7 +234,7 @@ def create_multiple_tasks():
 
 try:
     create_multiple_tasks()
-    TOKEN = config.TOKEN.decode('utf-8')
+    TOKEN = config.TOKEN
     bot.run(TOKEN)
 except (OSError, ConnectionError, discord.LoginFailure, KeyboardInterrupt) as e:
     print(e)
