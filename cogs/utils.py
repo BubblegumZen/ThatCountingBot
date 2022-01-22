@@ -1,15 +1,18 @@
-from genericpath import exists
 import discord
 import aiosqlite
 from typing import Tuple, Union
 from discord.ext import commands
+
+from utils.scraper import Scraper
 from utils.buttons import SetupButtons
+
 
 class Utility(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
         self.text_channel = "<:text_channel:933039916961656904>"
         self.count = "🔢"
+        self.anime_fetcher = Scraper(session=bot.session)
 
     async def update_info(self, *updates):
         to_update_possible = {'channel': 'channel_id', 'author': 'author_id', 'count': 'count'}
@@ -45,6 +48,23 @@ class Utility(commands.Cog):
         embed = discord.Embed(title="Current Configurations", description=formatted_string, color=self.bot.theme)
         view = SetupButtons(ctx, existing=existing)
         await ctx.send(embed=embed, view=view)
+    
+    @commands.command()
+    async def suggestanime(self, ctx: commands.Context):
+        anime = await self.anime_fetcher.connect()
+        embed = discord.Embed(color=self.bot.theme)
+        embed.set_thumbnail(url=anime.cover)
+        embed.description = f"""
+        **__Name__**: {anime.name.title()} ({anime.type})
+
+        **__Synopsis__**: {anime.description}
+
+        **__Age Rating__**: {anime.age_rating}
+        **__Rating__**: {anime.rating}
+        **__Total Episodes__**: {anime.episodes}
+        """
+        await ctx.send(embed=embed)
+        
 
 
 
