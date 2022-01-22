@@ -21,6 +21,8 @@ class SetupButtons(discord.ui.View):
             return True
         else:
             embed = discord.Embed(title="Not your embed", description=f"Only {self.ctx.author} can use this button")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return False
 
     def check_for_cache(self, guild_id):
         if guild_id in self.ctx.bot.cache:
