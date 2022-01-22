@@ -72,7 +72,7 @@ class Utility(commands.Cog):
                 embed.set_footer(text=f"{number+1}/{amount}")
                 final_embed_list.append(embed)
             view = ButtonPaginator(ctx=ctx, list_to_paginate=final_embed_list)
-            await ctx.send(embed=final_embed_list[0], view=view)
+            view.message = await ctx.send(embed=final_embed_list[0], view=view)
         else:
             anime = anime[0]
             embed = discord.Embed(color=self.bot.theme)

@@ -97,7 +97,7 @@ class SetupButtons(discord.ui.View):
 class ButtonPaginator(discord.ui.View):
     def __init__(self, *, ctx: commands.Context, list_to_paginate: list, timeout: Optional[float] = 60):
         super().__init__(timeout=timeout)
-        self.context = ctx
+        self.ctx = ctx
         self.list = list_to_paginate
         self.pointer = 0
 
