@@ -51,23 +51,25 @@ class Utility(commands.Cog):
     @commands.command()
     @commands.cooldown(1, 5.0, commands.BucketType.user)
     async def suggestanime(self, ctx: commands.Context, amount: int = 1):
+        if amount > 5:
+            return await ctx.send("Can\'t request 5 links at once!")
         anime_class = Scraper(session=self.bot.session, amount=amount)
         anime = await anime_class.connect()
         if len(anime) > 1:
             final_embed_list = []
-            for number in range(1, amount+1):
+            for number in range(0, amount):
                 embed = discord.Embed(color=self.bot.theme)
-                embed.set_thumbnail(url=anime.cover)
+                embed.set_thumbnail(url=anime[number].cover)
                 embed.description = f"""
-                **__Name__**: {anime.name.title()} ({anime.type})
+                **__Name__**: {anime[number].name.title()} ({anime[number].type})
 
-                **__Synopsis__**: {anime.description}
+                **__Synopsis__**: {anime[number].description}
 
-                **__Age Rating__**: {anime.age_rating}
-                **__Rating__**: {anime.rating}
-                **__Total Episodes__**: {anime.episodes}
+                **__Age Rating__**: {anime[number].age_rating}
+                **__Rating__**: {anime[number].rating}
+                **__Total Episodes__**: {anime[number].episodes}
                 """
-                embed.set_footer(text=f"{number}/{amount}")
+                embed.set_footer(text=f"{number+1}/{amount}")
                 final_embed_list.append(embed)
             view = ButtonPaginator(ctx=ctx, list_to_paginate=final_embed_list)
             return await ctx.send(embed=final_embed_list[0], view=view)
