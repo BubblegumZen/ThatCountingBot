@@ -183,7 +183,7 @@ async def send_cache_request(guild_id):
             record_cursor = await cursor.execute("SELECT count, channel_id, author_id FROM guilds WHERE guild_id = ?", (guild_id,))
             record = await record_cursor.fetchone()
     if guild_id in bot.cache:
-            cached = bot.cache[guild_id].count
+        cached = bot.cache[guild_id].count
     else:
         bot.cache[guild_id] = helper.Cache()
         cached = bot.cache[guild_id].count
@@ -207,7 +207,7 @@ async def create_table(cursor):
         channel_id INTEGER DEFAULT 0);'''
         )
 
-async def startup_task():
+async def startup_caching_task():
     async with aiosqlite.connect('./databases/count.db') as conn:
         async with conn.cursor() as cursor:
             try:
@@ -229,7 +229,7 @@ def create_multiple_tasks():
     bot.load_cogs()
     bot.check_for_outdated_logs()
     bot.create_new_log()
-    loop.create_task(startup_task())
+    loop.create_task(startup_caching_task())
 
 
 try:
