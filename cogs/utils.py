@@ -50,6 +50,7 @@ class Utility(commands.Cog):
         await ctx.send(embed=embed, view=view)
     
     @commands.command()
+    @commands.cooldown(1, 5.0, commands.BucketType.user)
     async def suggestanime(self, ctx: commands.Context):
         anime = await self.anime_fetcher.connect()
         embed = discord.Embed(color=self.bot.theme)
@@ -64,6 +65,12 @@ class Utility(commands.Cog):
         **__Total Episodes__**: {anime.episodes}
         """
         await ctx.send(embed=embed)
+
+    @suggestanime.error
+    async def on_error(self, ctx: commands.Context, error):
+        if isinstance(error, commands.CommandOnCooldown):
+            time_left = round(error.retry_after, 1)
+            return await ctx.send(f"You are using the command way too fast! Please try again after {time_left} Seconds")
         
 
 
