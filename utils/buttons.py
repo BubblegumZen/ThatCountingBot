@@ -138,7 +138,7 @@ class ButtonPaginator(discord.ui.View):
             await interaction.response.send_message(embed=embed, ephemeral=True)
             return False
     
-    @discord.ui.button(emoji="\N{BLACK LEFT-POINTING DOUBLE TRIANGLE}", disabled=True)
+    @discord.ui.button(emoji="⏪", disabled=True)
     async def first(self, button: discord.Button, interaction: discord.Interaction):
         if self.pointer == 0:
             return
@@ -146,7 +146,7 @@ class ButtonPaginator(discord.ui.View):
         self.disable_one_side('left')
         await interaction.message.edit(embed=self.list[0], view=self)
 
-    @discord.ui.button(emoji="\N{Leftwards Black Arrow}", disabled=True)
+    @discord.ui.button(emoji="◀️", disabled=True)
     async def back(self, button: discord.Button, interaction: discord.Interaction):
         handshake = self.check_back()
         if handshake:
@@ -154,11 +154,11 @@ class ButtonPaginator(discord.ui.View):
                 self.disable_one_side('left')
             await interaction.message.edit(embed=self.list[self.pointer], view=self)
 
-    @discord.ui.button(emoji="\N{Wastebasket}")
+    @discord.ui.button(emoji="🗑️")
     async def delete(self, button: discord.Button, interaction: discord.Interaction):
         await interaction.message.delete()
 
-    @discord.ui.button(emoji="", disabled=True)
+    @discord.ui.button(emoji="▶️", disabled=True)
     async def next(self, button: discord.Button, interaction: discord.Interaction):
         handshake = self.check_next()
         if handshake:
@@ -166,7 +166,7 @@ class ButtonPaginator(discord.ui.View):
                 self.disable_one_side('right')
             await interaction.message.edit(embed=self.list[self.pointer], view=self)
 
-    @discord.ui.button(emoji="", disabled=True)
+    @discord.ui.button(emoji="⏩", disabled=True)
     async def last(self, button: discord.Button, interaction: discord.Interaction):
         if self.pointer == len(self.list) - 1:
             return
