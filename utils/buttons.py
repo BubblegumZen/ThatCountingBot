@@ -158,7 +158,7 @@ class ButtonPaginator(discord.ui.View):
     async def delete(self, button: discord.Button, interaction: discord.Interaction):
         await interaction.message.delete()
 
-    @discord.ui.button(emoji="▶️", disabled=True)
+    @discord.ui.button(emoji="▶️")
     async def next(self, button: discord.Button, interaction: discord.Interaction):
         handshake = self.check_next()
         if handshake:
@@ -166,7 +166,7 @@ class ButtonPaginator(discord.ui.View):
                 self.disable_one_side('right')
             await interaction.message.edit(embed=self.list[self.pointer], view=self)
 
-    @discord.ui.button(emoji="⏩", disabled=True)
+    @discord.ui.button(emoji="⏩")
     async def last(self, button: discord.Button, interaction: discord.Interaction):
         if self.pointer == len(self.list) - 1:
             return
