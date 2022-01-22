@@ -52,7 +52,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 5.0, commands.BucketType.user)
     async def suggestanime(self, ctx: commands.Context, amount: int = 1):
         anime_class = Scraper(session=self.bot.session, amount=amount)
-        anime = anime_class.connect()
+        anime = await anime_class.connect()
         if len(anime) > 1:
             final_embed_list = []
             for number in range(1, amount+1):
