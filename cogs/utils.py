@@ -72,20 +72,21 @@ class Utility(commands.Cog):
                 embed.set_footer(text=f"{number+1}/{amount}")
                 final_embed_list.append(embed)
             view = ButtonPaginator(ctx=ctx, list_to_paginate=final_embed_list)
-            return await ctx.send(embed=final_embed_list[0], view=view)
-        anime = anime[0]
-        embed = discord.Embed(color=self.bot.theme)
-        embed.set_thumbnail(url=anime.cover)
-        embed.description = f"""
-        **__Name__**: {anime.name.title()} ({anime.type})
+            await ctx.send(embed=final_embed_list[0], view=view)
+        else:
+            anime = anime[0]
+            embed = discord.Embed(color=self.bot.theme)
+            embed.set_thumbnail(url=anime.cover)
+            embed.description = f"""
+            **__Name__**: {anime.name.title()} ({anime.type})
 
-        **__Synopsis__**: {anime.description}
+            **__Synopsis__**: {anime.description}
 
-        **__Age Rating__**: {anime.age_rating}
-        **__Rating__**: {anime.rating}
-        **__Total Episodes__**: {anime.episodes}
-        """
-        await ctx.send(embed=embed)
+            **__Age Rating__**: {anime.age_rating}
+            **__Rating__**: {anime.rating}
+            **__Total Episodes__**: {anime.episodes}
+            """
+            await ctx.send(embed=embed)
 
     @suggestanime.error
     async def on_error(self, ctx: commands.Context, error):
