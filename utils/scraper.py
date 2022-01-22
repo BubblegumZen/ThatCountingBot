@@ -61,7 +61,7 @@ class Scraper:
     FORMATTABLE_REGEX = "({}\?page=[0-9]+)"
     def __init__(self, *, session: Optional[aiohttp.ClientSession] = None) -> None:
         self._anime_regex = '(\/anime\/[0-9]+\/[A-Za-z_\-]+)'
-        self._session: Optional[aiohttp.ClientSession] = None
+        self._session: Optional[aiohttp.ClientSession] = session
         self.full_list = ['/anime/genre/1/Action', '/anime/genre/2/Adventure', '/anime/genre/3/Cars', '/anime/genre/4/Comedy', '/anime/genre/5/Avant', 
                           '/anime/genre/6/Demons', '/anime/genre/7/Mystery', '/anime/genre/8/Drama', '/anime/genre/9/Ecchi', '/anime/genre/10/Fantasy', 
                           '/anime/genre/11/Game', '/anime/genre/13/Historical', '/anime/genre/14/Horror', '/anime/genre/15/Kids', 
@@ -115,7 +115,6 @@ class Scraper:
         return [x.split('"')[0] for x in all_animes]
 
     async def fetch_anime_information(self, name: str):
-
         await self.require_session()
         params = {'filter[text]=': name}
         url = 'https://kitsu.io/api/edge/anime'
