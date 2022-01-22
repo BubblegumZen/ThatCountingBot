@@ -4,7 +4,7 @@ from typing import Tuple, Union
 from discord.ext import commands
 
 from utils.scraper import Scraper
-from utils.buttons import SetupButtons
+from utils.buttons import SetupButtons, ButtonPaginator
 
 
 class Utility(commands.Cog):
@@ -12,7 +12,6 @@ class Utility(commands.Cog):
         self.bot = bot
         self.text_channel = "<:text_channel:933039916961656904>"
         self.count = "🔢"
-        self.anime_fetcher = Scraper(session=bot.session)
 
     async def update_info(self, *updates):
         to_update_possible = {'channel': 'channel_id', 'author': 'author_id', 'count': 'count'}
@@ -51,8 +50,28 @@ class Utility(commands.Cog):
     
     @commands.command()
     @commands.cooldown(1, 5.0, commands.BucketType.user)
-    async def suggestanime(self, ctx: commands.Context):
-        anime = await self.anime_fetcher.connect()
+    async def suggestanime(self, ctx: commands.Context, amount: int = 1):
+        anime_class = Scraper(session=self.bot.session, amount=amount)
+        anime = anime_class.connect()
+        if len(anime) > 1:
+            final_embed_list = []
+            for number in range(1, amount+1):
+                embed = discord.Embed(color=self.bot.theme)
+                embed.set_thumbnail(url=anime.cover)
+                embed.description = f"""
+                **__Name__**: {anime.name.title()} ({anime.type})
+
+                **__Synopsis__**: {anime.description}
+
+                **__Age Rating__**: {anime.age_rating}
+                **__Rating__**: {anime.rating}
+                **__Total Episodes__**: {anime.episodes}
+                """
+                embed.set_footer(text=f"{number}/{amount}")
+                final_embed_list.append(embed)
+            view = ButtonPaginator(ctx=ctx, list_to_paginate=final_embed_list)
+            return await ctx.send(embed=final_embed_list[0], view=view)
+        anime = anime[0]
         embed = discord.Embed(color=self.bot.theme)
         embed.set_thumbnail(url=anime.cover)
         embed.description = f"""
@@ -71,6 +90,8 @@ class Utility(commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             time_left = round(error.retry_after, 1)
             return await ctx.send(f"You are using the command way too fast! Please try again after {time_left} Seconds")
+        elif isinstance(error, commands.BadArgument):
+            return await ctx.send(f"An Incorrect Argument was passed, use `{ctx.prefix}help {ctx.command.name}` for more info!")
         
 
 

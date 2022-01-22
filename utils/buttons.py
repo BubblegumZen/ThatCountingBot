@@ -1,5 +1,4 @@
 import asyncio
-from code import interact
 import discord
 import aiosqlite
 from typing import Optional
@@ -93,6 +92,90 @@ class SetupButtons(discord.ui.View):
                 await self.push_update('count', self.ctx.guild.id, number, number)
                 embed = discord.Embed(description=f"Successfully set current count to {number}")
                 return await interaction.followup.send(embed=embed, ephemeral=True)
+
+
+class ButtonPaginator(discord.ui.View):
+    def __init__(self, *, ctx: commands.Context, list_to_paginate: list, timeout: Optional[float] = 60):
+        super().__init__(timeout=timeout)
+        self.context = ctx
+        self.list = list_to_paginate
+        self.pointer = 0
+
+    def check_back(self):
+        if self.pointer == 0:
+            return False
+        self.pointer = self.pointer - 1
+        return True
+    
+    def check_next(self):
+        if self.pointer == len(self.list) - 1:
+            return False
+        self.pointer = self.pointer + 1
+        return True
+
+    def disable_one_side(self, side: str):
+        if side == 'left':
+            self.first.disabled = True
+            self.back.disabled = True
+            self.next.disabled = False
+            self.last.disabled = False
+        elif side == 'right':
+            self.next.disabled = True
+            self.last.disabled = True
+            self.back.disabled = False
+            self.first.disabled = False
+            
+    async def on_timeout(self) -> None:
+        for view in self.children:
+            view.disabled = True
+        await self.message.edit(view=self)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if self.ctx.author == interaction.user:
+            return True
+        else:
+            embed = discord.Embed(title="Not your embed", description=f"Only {self.ctx.author} can use this button")
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return False
+    
+    @discord.ui.button(emoji="\N{BLACK LEFT-POINTING DOUBLE TRIANGLE}", disabled=True)
+    async def first(self, button: discord.Button, interaction: discord.Interaction):
+        if self.pointer == 0:
+            return
+        self.pointer = 0
+        self.disable_one_side('left')
+        await interaction.message.edit(embed=self.list[0], view=self)
+
+    @discord.ui.button(emoji="\N{Leftwards Black Arrow}", disabled=True)
+    async def back(self, button: discord.Button, interaction: discord.Interaction):
+        handshake = self.check_back()
+        if handshake:
+            if self.pointer == 0:
+                self.disable_one_side('left')
+            await interaction.message.edit(embed=self.list[self.pointer], view=self)
+
+    @discord.ui.button(emoji="\N{Wastebasket}")
+    async def delete(self, button: discord.Button, interaction: discord.Interaction):
+        await interaction.message.delete()
+
+    @discord.ui.button(emoji="", disabled=True)
+    async def next(self, button: discord.Button, interaction: discord.Interaction):
+        handshake = self.check_next()
+        if handshake:
+            if self.pointer == len(self.list) - 1:
+                self.disable_one_side('right')
+            await interaction.message.edit(embed=self.list[self.pointer], view=self)
+
+    @discord.ui.button(emoji="", disabled=True)
+    async def last(self, button: discord.Button, interaction: discord.Interaction):
+        if self.pointer == len(self.list) - 1:
+            return
+        self.pointer = len(self.list) - 1
+        self.disable_one_side('right')
+        await interaction.message.edit(embed=self.list[-1], view=self)
+
+        
+        
 
 
 

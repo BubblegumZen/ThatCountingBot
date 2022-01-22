@@ -59,8 +59,9 @@ class Anime:
 class Scraper:
     BASE = "https://myanimelist.net"
     FORMATTABLE_REGEX = "({}\?page=[0-9]+)"
-    def __init__(self, *, session: Optional[aiohttp.ClientSession] = None) -> None:
+    def __init__(self, *, session: Optional[aiohttp.ClientSession] = None, amount: int = 1) -> None:
         self._anime_regex = '(\/anime\/[0-9]+\/[A-Za-z_\-]+)'
+        self.amount = amount
         self._session: Optional[aiohttp.ClientSession] = session
         self.full_list = ['/anime/genre/1/Action', '/anime/genre/2/Adventure', '/anime/genre/3/Cars', '/anime/genre/4/Comedy', '/anime/genre/5/Avant', 
                           '/anime/genre/6/Demons', '/anime/genre/7/Mystery', '/anime/genre/8/Drama', '/anime/genre/9/Ecchi', '/anime/genre/10/Fantasy', 
@@ -84,7 +85,7 @@ class Scraper:
         correctives = [('__', ': '), ('_', ' '), ('TV', '(TV)')]
         for old, corrected in correctives:
             anime_name = anime_name.replace(old, corrected)
-        return anime_id, anime_name       
+        return anime_name       
 
     async def require_session(self):
         if self._session is None or self._session.closed:
@@ -129,10 +130,10 @@ class Scraper:
         page_to_pick = random.choice(pages)
         new_response = await self.get_text(page_to_pick) 
         parsed_information = await self.parse_information(new_response)
-        anime_to_pick = random.choice(parsed_information)
-        final_result = self.parse_anime_link(anime_to_pick)
-        anime_information = await self.fetch_anime_information(final_result[1])
-        anime_class = Anime.from_dict(anime_information)
+        animes_to_pick = random.sample(parsed_information, self.amount)
+        final_result = [self.parse_anime_link(anime) for anime in animes_to_pick]
+        anime_information = [await self.fetch_anime_information(result) for result in final_result]
+        anime_class = [Anime.from_dict(anime) for anime in anime_information]
         return anime_class
 
     def __del__(self):
