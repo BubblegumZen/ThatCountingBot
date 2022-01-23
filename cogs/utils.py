@@ -47,6 +47,13 @@ class Utility(commands.Cog):
         embed = discord.Embed(title="Current Configurations", description=formatted_string, color=self.bot.theme)
         view = SetupButtons(ctx, existing=existing)
         await ctx.send(embed=embed, view=view)
+
+    @_setup.error
+    async def _setup_error(self, ctx: commands.Context, error):
+        if isinstance(error, commands.MissingPermissions):
+            perms = error.missing_permissions
+            formatted_perms = ', '.join([' '.join(x.split('_')) for x in perms])
+            return await ctx.send(f"You are missing **{formatted_perms}** to use this command!")
     
     @commands.command()
     @commands.cooldown(1, 5.0, commands.BucketType.user)
