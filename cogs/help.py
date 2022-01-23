@@ -40,7 +40,7 @@ class HelpClass(commands.HelpCommand):
         embed.description = f"Use `{self.context.prefix}help <command>` for help with a specific command."
         embed.set_footer(text=f"Requested By: {self.context.author.display_name}")
         for cog, commands in mapping.items():
-            if cog and cog.__class__.__cog_settings__.get('hidden'):
+            if cog and (cog.__class__.__cog_settings__.get('hidden') or cog.qualified_name == "Jishaku"):
                 continue  
             cog_name = cog.qualified_name if cog else 'Miscellaneous'
             list_of_commands = ', '.join([f"`{command.name}`" for command in commands if not command.hidden])
