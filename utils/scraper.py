@@ -101,8 +101,6 @@ class Scraper:
         modified_genre = genre.replace('/', r'\/')
         request_link_regex = self.FORMATTABLE_REGEX.format(modified_genre)
         text_response = re.findall(request_link_regex, text)
-        with open('sample.txt', 'w') as file:
-            file.write(text)
         try:
             last_page = text_response[-1]
         except IndexError:
