@@ -1,9 +1,7 @@
 from __future__ import annotations
-import json
 import re
 import time
 import random
-import pprint
 import aiohttp
 import asyncio
 from typing import Dict, Optional
@@ -60,7 +58,7 @@ class Scraper:
     BASE = "https://myanimelist.net"
     FORMATTABLE_REGEX = "({}\?page=[0-9]+)"
     def __init__(self, *, session: Optional[aiohttp.ClientSession] = None, amount: int = 1) -> None:
-        self._anime_regex = '(\/anime\/[0-9]+\/[A-Za-z_\-]+)'
+        self._anime_regex = '(\/anime\/[0-9]+\/.+)'
         self.amount = amount
         self._session: Optional[aiohttp.ClientSession] = session
         self.full_list = ['/anime/genre/1/Action', '/anime/genre/2/Adventure', '/anime/genre/3/Cars', '/anime/genre/4/Comedy', '/anime/genre/5/Avant', 
@@ -81,7 +79,6 @@ class Scraper:
     def parse_anime_link(url: str):
         splited = url.split('/')
         anime_name = splited[-1]
-        anime_id = splited[-2]
         correctives = [('__', ': '), ('_', ' '), ('TV', '(TV)')]
         for old, corrected in correctives:
             anime_name = anime_name.replace(old, corrected)
@@ -93,6 +90,8 @@ class Scraper:
 
     async def get_text(self, url: str):
         await self.require_session()
+        if isinstance(url, Anime):
+            return
         response = await self._session.get(url)
         text = await response.text()
         return text
@@ -111,7 +110,7 @@ class Scraper:
 
     async def parse_information(self, text: str):
         all_animes = re.findall(self._anime_regex, text)
-        return [x.split('"')[0] for x in all_animes]
+        return [x.split('"')[0] for x in all_animes if "video" not in x.split('"')[0]]
 
     async def fetch_anime_information(self, name: str):
         await self.require_session()
@@ -126,7 +125,7 @@ class Scraper:
         response = await self.get_text(self.BASE + genre)
         pages = await self.get_all_pages(response, genre)
         page_to_pick = random.choice(pages)
-        new_response = await self.get_text(page_to_pick) 
+        new_response = await self.get_text(page_to_pick)
         parsed_information = await self.parse_information(new_response)
         animes_to_pick = random.sample(parsed_information, self.amount)
         final_result = [self.parse_anime_link(anime) for anime in animes_to_pick]
@@ -140,7 +139,7 @@ class Scraper:
 
 if __name__ == "__main__":
     start = time.perf_counter()
-    class_instance = Scraper()
+    class_instance = Scraper(amount=5)
     coroutine = class_instance.connect()
     asyncio.run(coroutine)
     end = time.perf_counter()

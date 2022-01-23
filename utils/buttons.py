@@ -124,10 +124,13 @@ class ButtonPaginator(discord.ui.View):
             self.last.disabled = True
             self.back.disabled = False
             self.first.disabled = False
+    
+    def disable_or_enable_all(self, value: bool):
+        for view in self.children:
+            view.disabled = value
             
     async def on_timeout(self) -> None:
-        for view in self.children:
-            view.disabled = True
+        self.disable_or_enable_all(True)
         await self.message.edit(view=self)
 
     async def interaction_check(self, interaction: discord.Interaction) -> bool:
@@ -150,6 +153,7 @@ class ButtonPaginator(discord.ui.View):
     async def back(self, button: discord.Button, interaction: discord.Interaction):
         handshake = self.check_back()
         if handshake:
+            self.disable_or_enable_all(False)
             if self.pointer == 0:
                 self.disable_one_side('left')
             await interaction.message.edit(embed=self.list[self.pointer], view=self)
@@ -162,6 +166,7 @@ class ButtonPaginator(discord.ui.View):
     async def next(self, button: discord.Button, interaction: discord.Interaction):
         handshake = self.check_next()
         if handshake:
+            self.disable_or_enable_all(False)
             if self.pointer == len(self.list) - 1:
                 self.disable_one_side('right')
             await interaction.message.edit(embed=self.list[self.pointer], view=self)
