@@ -6,6 +6,33 @@ from utils.helper import Cache
 from discord.ext import commands
 
 
+class ButtonDelete(discord.ui.View):
+    __slots__ = ('context',)
+
+    def __init__(self, ctx):
+        super().__init__(timeout=60)
+        self.context = ctx
+
+    async def on_timeout(self):
+        self.clear_items()
+        # await self.message.edit(view=self)
+        self.stop()
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if interaction.user.id == self.context.author.id:
+            return True
+        checkmbed = discord.Embed(
+            colour=0x2F3136,
+            description=f"<@{interaction.user.mention}>, Only <@{self.context.author.mention}> can use this.",
+            timestamp=self.context.message.created_at
+        )
+        await interaction.response.send_message(embed=checkmbed, ephemeral=True)
+        return False
+
+    @discord.ui.button(emoji='🗑️', style=discord.ButtonStyle.gray)
+    async def buttondelete(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await self.context.message.add_reaction("☑️")
+        await interaction.message.delete()
 
 class SetupButtons(discord.ui.View):
     def __init__(self, ctx: commands.Context, *, existing: bool, timeout: Optional[float] = 180):

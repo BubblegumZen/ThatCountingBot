@@ -35,8 +35,12 @@ class CountBot(commands.AutoShardedBot):
         self.cache = {}
         self.logger = logging.getLogger('discord')
         self.logger.setLevel(logging.INFO)
-        self.load_extension('jishaku')
         self._counter = {}
+
+    os.environ["JISHAKU_NO_DM_TRACEBACK"] = "False"
+    os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
+    os.environ["JISHAKU_HIDE"] = "True"
+    os.environ["JISHAKU_RETAIN"] = "True"
 
     async def on_ready(self):
         print(bot.user.name, "is now ready!")
@@ -163,19 +167,6 @@ async def record_and_cache_info(message):
     cached_object.count['count'] = int(message.content)
     cached_object.count['author_id'] = message.author.id
 
-
-# async def verify_author(message): # ???????????????????????????????????
-#     with open('author.txt', 'r') as file:
-#         content = file.read()
-#         if not content:
-#             content = 1
-#             await record_author(message)
-#         if message.author.id == int(content):
-#             await message.delete()
-#             await bot.check_ratelimit(message)
-#             return False
-#         await record_author(message)
-#         return True
 
 async def send_cache_request(guild_id):
     async with aiosqlite.connect('./databases/count.db') as conn:

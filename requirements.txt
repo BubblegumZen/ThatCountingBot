@@ -17,6 +17,7 @@ humanize
 idna==3.3
 jishaku
 multidict==5.2.0
+psutil
 pycares==4.1.2
 pycparser==2.21
 rfc3986==1.5.0
