@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 databases/*
 logs/*
+count
+count/*
 
 # C extensions
 *.so
