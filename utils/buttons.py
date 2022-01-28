@@ -5,6 +5,32 @@ from typing import Optional
 from utils.helper import Cache
 from discord.ext import commands
 
+class SpotifyButton(discord.ui.View):
+    def __init__(self, ctx: commands.Context, act: discord.Spotify, *, timeout: Optional[float] = 180):
+        super().__init__(timeout=timeout)
+        self.add_item(
+            discord.ui.Button(label='Listen On Spotify', url=act.track_url, emoji="<:Spotify:919727284066336789>"))
+        self.act = act
+        self.context = ctx
+        self.author = ctx.author
+
+    async def on_timeout(self):
+        self.deletembed.disabled = True
+        await self.message.edit(view=self)
+
+    async def interaction_check(self, interaction: discord.Interaction) -> bool:
+        if interaction.user == self.author:
+            return True
+        else:
+            em = discord.Embed(title="Begone!",
+                               description=f"This is not yours, only **`{self.author.name}`** can use this button.")
+            await interaction.response.send_message(embed=em, ephemeral=True)
+            return False
+
+    @discord.ui.button(emoji="🗑️", label="Close Embed", style=discord.ButtonStyle.red)
+    async def deletembed(self, button: discord.ui.Button, interaction: discord.Interaction):
+        await interaction.message.delete()
+
 
 class ButtonDelete(discord.ui.View):
     __slots__ = ('context',)
@@ -23,7 +49,7 @@ class ButtonDelete(discord.ui.View):
             return True
         checkmbed = discord.Embed(
             colour=0x2F3136,
-            description=f"<@{interaction.user.mention}>, Only <@{self.context.author.mention}> can use this.",
+            description=f"{interaction.user.mention}, Only {self.context.author.mention} can use this.",
             timestamp=self.context.message.created_at
         )
         await interaction.response.send_message(embed=checkmbed, ephemeral=True)

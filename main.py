@@ -24,6 +24,7 @@ from discord.ext import commands
 
 intents = discord.Intents.default()
 intents.members = True
+intents.presences = True
 
 class CountBot(commands.AutoShardedBot):
     def __init__(self, **kwargs):
@@ -35,7 +36,8 @@ class CountBot(commands.AutoShardedBot):
         self.cache = {}
         self.logger = logging.getLogger('discord')
         self.logger.setLevel(logging.INFO)
-        self._counter = {}
+        self.spotify_client_id = config.SPOTIFY_CLIENT_ID
+        self.spotify_client_secret = config.SPOTIFY_CLIENT_SECRET
 
     os.environ["JISHAKU_NO_DM_TRACEBACK"] = "False"
     os.environ["JISHAKU_NO_UNDERSCORE"] = "True"

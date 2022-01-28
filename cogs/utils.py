@@ -2,7 +2,7 @@ import discord
 import aiosqlite
 from typing import Tuple, Union
 from discord.ext import commands
-
+from utils.helper import Spotify
 from utils.scraper import Scraper
 from utils.buttons import SetupButtons, ButtonPaginator
 
@@ -102,6 +102,22 @@ class Utility(commands.Cog):
             return await ctx.send(f"You are using the command way too fast! Please try again after {time_left} Seconds")
         elif isinstance(error, commands.BadArgument):
             return await ctx.send(f"An Incorrect Argument was passed, use `{ctx.prefix}help {ctx.command.name}` for more info!")
+
+    @commands.command(aliases=['sp'])
+    @commands.cooldown(5, 60.0, type=commands.BucketType.user)
+    async def spotify(self, ctx: commands.Context, member: discord.Member = None):
+        member = member or ctx.author
+        async with ctx.typing():
+            spotify = Spotify(bot=self.client, member=member)
+            embed = await spotify.get_embed()
+            if not embed:
+                if member == ctx.author:
+                    return await ctx.reply(f"You are currently not listening to spotify!", mention_author=False)
+                return await ctx.reply(f"{member.mention} is not listening to Spotify", mention_author=False,
+                                       allowed_mentions=discord.AllowedMentions(users=False))
+            activity = discord.utils.find(lambda act: isinstance(act, discord.Spotify), member.activities)
+            view = SpotifyButton(ctx, activity)
+            view.message = await ctx.send(embed=embed[0], file=embed[1], view=view)
         
 
 
