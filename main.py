@@ -36,6 +36,7 @@ class CountBot(commands.AutoShardedBot):
         self.cache = {}
         self.logger = logging.getLogger('discord')
         self.logger.setLevel(logging.INFO)
+        self.spotify_session = None
         self.spotify_client_id = config.SPOTIFY_CLIENT_ID
         self.spotify_client_secret = config.SPOTIFY_CLIENT_SECRET
 
