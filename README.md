@@ -10,7 +10,7 @@ __Recommended Versions__:-
 
 # About ThatCountingBot
 
-ThatCountingBot is a discord bot written in python which uses `discord.py` wrapper for Discord API. The bot requires `Guild Member` Intents enabled. After April 26, 2022, you need to enable `Message Read Intents` for the bot to function. This bot can track counting in a server, and ofers count pickups from channel that were previously used for counting. It will delete the message if numbers aren't correctly sent in order, and if this violation is done 5 times in a row, then it will timeout the member for 10 minutes, the timeout limit is configurable. ThatCountingBot also offers a leveling system, that ranks users up. It also has a `$rank` command that generates a rank card similar to `MEE6` along with their server rank. 
+ThatCountingBot is a discord bot written in python which uses `discord.py` wrapper for Discord API. The bot requires `Guild Member` and `Presences` Intents enabled. After April 26, 2022, you need to enable `Message Read Intents` for the bot to function. This bot can track counting in a server, and ofers count pickups from channel that were previously used for counting. It will delete the message if numbers aren't correctly sent in order, and if this violation is done 5 times in a row, then it will timeout the member for 10 minutes, the timeout limit is configurable. ThatCountingBot also offers a leveling system, that ranks users up. It also has a `$rank` command that generates a rank card similar to `MEE6` along with their server rank. 
 
 ![Level Rank Card](https://user-images.githubusercontent.com/97220904/150376149-1138f182-2ef1-489e-aafa-347a824d56ed.png)
 
