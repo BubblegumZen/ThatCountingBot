@@ -108,7 +108,7 @@ class Utility(commands.Cog):
     async def spotify(self, ctx: commands.Context, member: discord.Member = None):
         member = member or ctx.author
         async with ctx.typing():
-            spotify = Spotify(bot=self.client, member=member)
+            spotify = Spotify(bot=self.bot, member=member)
             embed = await spotify.get_embed()
             if not embed:
                 if member == ctx.author:
