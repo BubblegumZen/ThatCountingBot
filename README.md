@@ -23,7 +23,7 @@ In addition to this, it offers the `$setup` command for the counting channel and
 1. Go to [Discord Developer Page](https://discord.com/developers/applications)
 2. Create an Application
 3. Head over to `Bot` section and select `Create a bot account`
-4. Turn on `Message Intent` and `Guild/Server Member Intent`.
+4. Turn on `Message Intent` and `Guild/Server Member Intent` and `Presence Intent`.
 5. Click on `COPY TOKEN`
 6. Clone this repository to a local folde
 7. Open `config.py` file and replace the placeholder `BOT_TOKEN` with the token you just copied.
