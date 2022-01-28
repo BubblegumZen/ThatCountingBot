@@ -4,7 +4,7 @@ from typing import Tuple, Union
 from discord.ext import commands
 from utils.helper import Spotify
 from utils.scraper import Scraper
-from utils.buttons import SetupButtons, ButtonPaginator
+from utils.buttons import SetupButtons, SpotifyButton, ButtonPaginator
 
 
 class Utility(commands.Cog):
@@ -118,8 +118,6 @@ class Utility(commands.Cog):
             activity = discord.utils.find(lambda act: isinstance(act, discord.Spotify), member.activities)
             view = SpotifyButton(ctx, activity)
             view.message = await ctx.send(embed=embed[0], file=embed[1], view=view)
-        
-
 
 
 def setup(bot):

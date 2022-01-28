@@ -52,8 +52,6 @@ class Anime:
                     titles=titles
                   )
 
-
-
 class Scraper:
     BASE = "https://myanimelist.net"
     FORMATTABLE_REGEX = "({}\?page=[0-9]+)"
