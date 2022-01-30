@@ -131,9 +131,6 @@ class Scraper:
         anime_class = [Anime.from_dict(anime) for anime in anime_information]
         return anime_class
 
-    def __del__(self):
-        asyncio.run(self._session.close())
-
 
 if __name__ == "__main__":
     start = time.perf_counter()

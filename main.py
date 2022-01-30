@@ -1,5 +1,7 @@
+import asyncio
 import os
 import sys
+import json
 import config
 import logging
 import aiohttp
@@ -8,7 +10,7 @@ import humanize
 import aiosqlite
 import subprocess
 from utils import helper
-from typing import Union
+from typing import Optional, Tuple, Union
 
 def clear_console():
     subprocess.check_call(['clear'])
@@ -27,18 +29,23 @@ intents.members = True
 intents.presences = True
 
 class CountBot(commands.AutoShardedBot):
+    COG_DISABLED = ['level.py']
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.theme = 0xA8A5F1
-        self.session = None
-        self.uptime = datetime.datetime.utcnow()
+        self.theme: int = 0xA8A5F1
+        self.level_conn: aiosqlite.Connection = None
+        self.count_conn: aiosqlite.Connection = None
+        self.config_conn: aiosqlite.Connection = None
+        self.session: Optional[aiohttp.ClientSession] = None
+        self.uptime: datetime.datetime = datetime.datetime.utcnow()
         self.formatted = self.uptime.strftime('%d %B %Y | %H:%M:%S')
-        self.cache = {}
-        self.logger = logging.getLogger('discord')
+        self.cache: dict = {}
+        self.cache_suspicious_links: Optional[list] = None
+        self.logger: logging.Logger = logging.getLogger('discord')
         self.logger.setLevel(logging.INFO)
-        self.spotify_session = None
-        self.spotify_client_id = config.SPOTIFY_CLIENT_ID
-        self.spotify_client_secret = config.SPOTIFY_CLIENT_SECRET
+        self.spotify_session: Optional[Tuple] = None
+        self.spotify_client_id: str = config.SPOTIFY_CLIENT_ID
+        self.spotify_client_secret: str = config.SPOTIFY_CLIENT_SECRET
 
     os.environ["JISHAKU_NO_DM_TRACEBACK"] = "False"
     os.environ["JISHAKU_NO_UNDERSCORE"] = "True"
@@ -48,6 +55,7 @@ class CountBot(commands.AutoShardedBot):
     async def on_ready(self):
         print(bot.user.name, "is now ready!")
 
+    # maybe remove
     async def get_or_fetch_bot_entity(self, snowflake: id, obj: str) -> Union[discord.User, discord.TextChannel, discord.VoiceChannel]:
         object_dict_list = {
             'channel': (self.get_channel, self.fetch_channel),
@@ -62,6 +70,7 @@ class CountBot(commands.AutoShardedBot):
                 to_return = None
         return to_return
 
+    # maybe remove
     async def get_or_fetch_guild_entity(self, snowflake: id, guild_id: int, obj: str) -> Union[discord.Member, discord.User, discord.TextChannel, discord.VoiceChannel]:
         guild = self.get_guild(guild_id)
         if not guild:
@@ -81,11 +90,14 @@ class CountBot(commands.AutoShardedBot):
 
     async def start(self, *args, **kwargs):
         async with aiohttp.ClientSession() as self.session:
-            return await super().start(*args, **kwargs)
+            async with aiosqlite.connect('./databases/level.db') as self.level_conn:
+                async with aiosqlite.connect('./databases/count.db') as self.count_conn:
+                        async with aiosqlite.connect('./databases/config.db') as self.config_conn:
+                            return await super().start(*args, **kwargs)
 
     def load_cogs(self):
         for filename in os.listdir('./cogs'):
-            if filename.endswith('.py'):
+            if filename.endswith('.py') and filename not in self.COG_DISABLED:
                 self.load_extension(f'cogs.{filename[:-3]}')
 
     def check_for_outdated_logs(self):
@@ -153,6 +165,11 @@ async def on_message(message: discord.Message):
 async def _console(ctx):
     clear_console()
 
+@bot.check
+async def ready_check(ctx):
+    await ctx.bot.wait_until_ready()
+    return True
+
 @bot.command()
 async def uptime(ctx: commands.Context):
     time_delta = datetime.datetime.utcnow() - bot.uptime
@@ -160,22 +177,20 @@ async def uptime(ctx: commands.Context):
     await ctx.send(f"The bot has been online for: {time_readable}")
 
 async def record_and_cache_info(message):
-    async with aiosqlite.connect('./databases/count.db') as conn:
-        async with conn.cursor() as cursor:
-            await cursor.execute("UPDATE guilds SET (author_id) = ?, (count) = ?, (message_id) = ? WHERE guild_id = ?", 
+    async with bot.count_conn.cursor() as cursor:
+        await cursor.execute("UPDATE guilds SET (author_id) = ?, (count) = ?, (message_id) = ? WHERE guild_id = ?", 
                             (message.author.id, int(message.content), message.id, message.guild.id,)
                         )
-        await conn.commit()
+    await bot.count_conn.commit()
     cached_object = bot.cache[message.guild.id]
     cached_object.count['count'] = int(message.content)
     cached_object.count['author_id'] = message.author.id
 
 
 async def send_cache_request(guild_id):
-    async with aiosqlite.connect('./databases/count.db') as conn:
-         async with conn.cursor() as cursor:
-            record_cursor = await cursor.execute("SELECT count, channel_id, author_id FROM guilds WHERE guild_id = ?", (guild_id,))
-            record = await record_cursor.fetchone()
+    async with bot.count_conn.cursor() as cursor:
+        record_cursor = await cursor.execute("SELECT count, channel_id, author_id FROM guilds WHERE guild_id = ?", (guild_id,))
+        record = await record_cursor.fetchone()
     if guild_id in bot.cache:
         cached = bot.cache[guild_id].count
     else:
@@ -215,19 +230,23 @@ async def startup_caching_task():
                 author_id = record[2]
                 channel_id = record[3]
                 bot.cache[guild_id] = helper.Cache({'count': count, 'author_id': author_id, 'channel_id': channel_id})
-                print(bot.cache)
         await conn.commit()
-            
-def create_multiple_tasks():
-    loop = bot.loop
-    bot.load_cogs()
-    bot.check_for_outdated_logs()
-    bot.create_new_log()
-    loop.create_task(startup_caching_task())
 
+async def fill_suspicious_link():
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://raw.githubusercontent.com/nikolaischunk/discord-phishing-links/main/domain-list.json") as response:
+            text = json.loads(await response.text())
+            bot.cache_suspicious_links = text['domains']
+            
+def create_multiple_tasks(loop):
+    bot.load_cogs()
+    bot.create_new_log()
+    bot.check_for_outdated_logs()
+    loop.create_task(startup_caching_task())
+    loop.run_until_complete(fill_suspicious_link())
 
 try:
-    create_multiple_tasks()
+    create_multiple_tasks(bot.loop)
     TOKEN = config.TOKEN
     bot.run(TOKEN)
 except (OSError, ConnectionError, discord.LoginFailure, KeyboardInterrupt) as e:

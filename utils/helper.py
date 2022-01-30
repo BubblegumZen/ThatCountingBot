@@ -391,3 +391,5 @@ class Cache:
     count: dict = field(default_factory=dict) # {'author_id': int, 'channel_id': int}
     prefix: str = "$" # str
     rate_limit: dict = field(default_factory=dict) # {'author_id': (int, datetime.datetime)}
+    anti_raid_limit: dict = field(default_factory=dict) # {id: [int, list[Message]]}
+    extra_settings: dict = field(default_factory=dict)
