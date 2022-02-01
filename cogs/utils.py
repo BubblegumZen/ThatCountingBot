@@ -114,7 +114,7 @@ class Utility(commands.Cog):
     def delete_or_add(self, cache: Cache, message: discord.Message, *args):
         cached_object = cache.anti_raid_limit
         if message.author.id in cached_object:
-            if message.content == cached_object[message.author.id][0][1][-1].content:
+            if message.content == cached_object[message.author.id][0][1][-1].content and not message.attachments:
                 distinct_channels = len(set([x.channel for x in cached_object[message.author.id][0][1]]))
                 if (distinct_channels/len(message.guild.text_channels))*100 < 50:
                     cached_object[message.author.id][0][0] += 1
@@ -157,8 +157,7 @@ class Utility(commands.Cog):
                     https://github.com/BuildBot42/discord-scam-links/blob/main/list.txt
         alert.
         """
-        
-        if message.author == self.bot.user:
+        if message.author.bot:
             return
         records = await self.fetch_info_config(message.guild.id)
         if not records:

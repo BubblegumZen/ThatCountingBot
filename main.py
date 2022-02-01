@@ -3,6 +3,7 @@ import os
 import sys
 import json
 import config
+import uvloop
 import logging
 import aiohttp
 import datetime
@@ -246,6 +247,7 @@ def create_multiple_tasks(loop):
     loop.run_until_complete(fill_suspicious_link())
 
 try:
+    uvloop.install()
     create_multiple_tasks(bot.loop)
     TOKEN = config.TOKEN
     bot.run(TOKEN)
