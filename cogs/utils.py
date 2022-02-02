@@ -1,12 +1,14 @@
 import re
 import enum
+import random
 import discord
 import datetime
 import aiosqlite
 from utils.scraper import Scraper
+from utils.games import BrainGame
 from utils.helper import Spotify, Cache
 from discord.ext import commands, tasks
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, final
 from utils.buttons import SetupButtons, SpotifyButton, ButtonPaginator, ConfigSetupButtons, AlertButton
 
 class Violation(enum.Enum):
@@ -286,6 +288,21 @@ class Utility(commands.Cog):
             activity = discord.utils.find(lambda act: isinstance(act, discord.Spotify), member.activities)
             view = SpotifyButton(ctx, activity)
             view.message = await ctx.send(embed=embed[0], file=embed[1], view=view)
+
+    @commands.command(aliases=['mg'])
+    async def memorygame(self, ctx: commands.Context):
+        urandom = random.SystemRandom()
+        initial_list = ['<:xbox:938379038672695346>', '<:ps4:938379282428866570>', '<:nswitch:938379552131014666>', '<:nintendo:938379597446262805>', 
+                        '<:osu:938380911395868732>', '<:edge:938381575102554173>', '<:chrome:938381590868946985>', '<:onedrive:938381807492169738>', 
+                        '<:albion:938383632425439312>', '<:discord:938384317116207155>', '<:EAsports:938384607785652274>', '<:facebook:938403932282179616>', 
+                        '<:instagram:938403961512275989>', '<:guilded:938403976653705307>', '<:twitter:938403988628451379>', '<:snapchat:938404006777192480>', 
+                        '<:twitch:938404024217128991>', '<:streamlabs:938404039325012009>', '<:obs:938404051530416158>', '<:6377firefox:938404067477180456>']
+        final_list = urandom.sample(initial_list, 10)*2
+        urandom.shuffle(final_list)
+        final_list = tuple(enumerate([tuple(enumerate(final_list[n:n+5])) for n in range(0, len(final_list), 5)]))
+        view = BrainGame(final_list)
+        await ctx.send("Match all the tiles", view=view)
+
 
 
 def setup(bot):

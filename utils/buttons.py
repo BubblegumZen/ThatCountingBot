@@ -338,7 +338,7 @@ class AlertButton(discord.ui.View):
             await interaction.guild.ban(self.message.author, reason="Spam Account")
             await interaction.response.send_message(f'{interaction.user.mention} Chose to Ban {self.message.author.mention}!')
         except discord.Forbidden:
-            await interaction.response.send_message('My role is lower than the person you are trying to ban!', ephemeral=True)
+            await interaction.response.send_message('My role is lower than the person you are trying to ban or I don\'t have the permission to ban!', ephemeral=True)
 
     @discord.ui.button(label="Kick Member", emoji="<:kick_user:937258718335209523>")
     async def kick_user(self, _, interaction: discord.Interaction):
@@ -354,7 +354,6 @@ class AlertButton(discord.ui.View):
     async def timeout_member(self, _, interaction: discord.Interaction):
         if self.message.guild.me.top_role.position < self.message.author.top_role.position:
             return await interaction.response.send_message('My role is lower than the person you are trying to timeout!')
-
         handshake = await timeout_user(self.bot, user_id=self.message.author.id, guild_id=self.message.guild.id, until=60)
         if handshake:
             return await interaction.response.send_message(f'{interaction.user.mention} Chose to Timeout {self.message.author.mention}!')
