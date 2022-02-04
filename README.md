@@ -25,6 +25,7 @@ The channel and mentionable role can be setup with `$serverconfig` command
 ![image](https://user-images.githubusercontent.com/97220904/152598639-216ae029-767d-4710-a1f7-f70581cb9cda.png)
 
 In addition to this, this bot also offers a match the tile memory game using interaction buttons. It can be used with `$mg` command:
+
 ![image](https://user-images.githubusercontent.com/97220904/152598676-63893c9f-ccdb-4daf-8d38-cb1720a56ff1.png)
 
 
