@@ -20,6 +20,7 @@ In addition to this, it offers the `$setup` command for the counting channel and
 
 A new anti-phishing feature has been added to the bot!
 The channel and mentionable role can be setup with `$serverconfig` command
+![image](https://user-images.githubusercontent.com/97220904/152598782-5dd297b1-2f49-486c-a7a3-e47a41d51746.png)
 ![image](https://user-images.githubusercontent.com/97220904/152598639-216ae029-767d-4710-a1f7-f70581cb9cda.png)
 
 In addition to this, this bot also offers a match the tile memory game using interaction buttons. It can be used with `$mg` command:
