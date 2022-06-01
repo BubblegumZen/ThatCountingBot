@@ -12,7 +12,7 @@ charset-normalizer==2.0.10
 discord.py @ git+https://github.com/BubblegumZen/discord.py.git
 h11==0.12.0
 httpcore==0.14.4
-httpx==0.21.3
+httpx==0.23.0
 humanize
 idna==3.3
 jishaku
