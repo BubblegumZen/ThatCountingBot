@@ -18,7 +18,7 @@ idna==3.3
 jishaku
 multidict==5.2.0
 psutil
-pycares==4.1.2
+pycares==4.2.0
 pycparser==2.21
 rfc3986==1.5.0
 sniffio==1.2.0
